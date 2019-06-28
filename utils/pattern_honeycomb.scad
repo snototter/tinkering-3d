@@ -8,7 +8,7 @@
 // Example
 for (y = [0:30:500]){
     translate([0,y])
-    honeycomb(21+floor(y/30), 20, 5, 7, 2);
+    honeycomb_pattern(x=21+floor(y/30), y=20, z=5, diameter_comb=7, wall=2, center=true);
 }
 
 
@@ -29,9 +29,10 @@ module hexagon(diameter)
  * wall
  *     thickness of the wall between two combs
  */
-module honeycomb(x, y, z, diameter_comb, wall, center=true)
+module honeycomb_pattern(x, y, z, diameter_comb, wall, center=true)
 {
     /**
+     * Note: The following visualization is optimized for the OpenSCAD editor.
      * D = diameter_comb:
      *     _______
      *    /        / \
