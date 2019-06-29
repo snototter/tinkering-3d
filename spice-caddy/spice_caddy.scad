@@ -96,23 +96,37 @@ module caddy(w1, w2, h1, h2, length, num_side_walls, wall, side_wall_margin, sid
 } 
  
  // The original tea bag caddy:
- wall=2.4;
- length=180;
- w1=70;
- h1=60;
- 
- num_side_walls = 3;
- 
- w2=w1-2*18;
- h2=h1-12;
- 
- side_wall_margin=5;
- side_wall_square_wall=4;
- side_wall_square_size=9;
- $fn = 72;
- caddy(w1, w2, h1, h2, length, num_side_walls, wall, side_wall_margin, side_wall_square_size, side_wall_square_wall);
- 
+ /*wall=2.4;
+length=180;
+w1=70;
+h1=60;
+
+num_side_walls = 3;
+
+w2=w1-2*18;
+h2=h1-12;
+
+side_wall_margin=5;
+side_wall_square_wall=4;
+side_wall_square_size=9;
+$fn = 72;
+caddy(w1, w2, h1, h2, length, num_side_walls, wall, side_wall_margin, side_wall_square_size, side_wall_square_wall);
+*/ 
  
  // Spices (+2cm hoehe;
+wall=2.4;
+w1 = 125+2*wall; // TODO nachmessen; TODO schmaelstes messen
+w2 = w1 - 2*24;
+length = 180;
 
+h1 = 80;
+h2 = h1 - 20;
+
+num_side_walls = 3; 
+
+side_wall_margin=5;
+side_wall_square_wall=4;
+side_wall_square_size=9;
+$fn = 72;
+caddy(w1, w2, h1, h2, length, num_side_walls, wall, side_wall_margin, side_wall_square_size, side_wall_square_wall);
  
