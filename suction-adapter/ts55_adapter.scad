@@ -66,31 +66,34 @@ module ts_suction_adapter(h_ts, h_ts1, h_ts2, d_ts, thickness_lock, w_lock, h_tr
     d_suction_inner = d_suction - thickness_lock - 1.5;
     
     // TS55
-    difference()
+    union()
     {
-        cylinder(d = d_ts_outer, h = h_ts, center=false);
+        difference()
+        {
+            cylinder(d = d_ts_outer, h = h_ts, center=false);
+            
+            // Lock cut out
+            lock_negative(d_ts_lock, h_ts, h_ts1, h_ts2, thickness_lock, w_lock);
+            translate([0, 0, -1])
+            cylinder(d = d_ts, h = h_ts + 2, center = false);
+        }
         
-        // Lock cut out
-        lock_negative(d_ts_lock, h_ts, h_ts1, h_ts2, thickness_lock, w_lock);
-        translate([0, 0, -1])
-        cylinder(d = d_ts, h = h_ts + 2, center = false);
+        // TODO proper rotation!
+    /*    translate([d_ts_outer/2-1, 0, 0])
+        rotate([90, 0, 30])
+        linear_extrude(1.5)
+        text("L", scale=1.5, halign="center");
+      */  
+       
+        
+        // Transition / Rejuvenation
+        translate([0, 0, h_ts])
+        rejuvenating_pipe(d_ts_outer, d_suction, d_ts, d_suction_inner, h_transition, center=false);
+        
+        // Suction adapter
+        translate([0, 0, h_ts + h_transition])
+        pipe(d_suction, d_suction_inner, h_suction, center=false);
     }
-    
-    // TODO proper rotation!
-/*    translate([d_ts_outer/2-1, 0, 0])
-    rotate([90, 0, 30])
-    linear_extrude(1.5)
-    text("L", scale=1.5, halign="center");
-  */  
-   
-    
-    // Transition / Rejuvenation
-    translate([0, 0, h_ts])
-    rejuvenating_pipe(d_ts_outer, d_suction, d_ts, d_suction_inner, h_transition, center=false);
-    
-    // Suction adapter
-    translate([0, 0, h_ts + h_transition])
-    pipe(d_suction, d_suction_inner, h_suction, center=false);
     /*difference()
     {
         translate([0, 0, h_ts])
