@@ -115,7 +115,7 @@ caddy(w1, w2, h1, h2, length, num_side_walls, wall, side_wall_margin, side_wall_
  
  // Spices (+2cm hoehe;
 wall=2.4;
-w1 = 125+2*wall; // TODO nachmessen; TODO schmaelstes messen
+w1 = 124+2*wall; // TODO nachmessen; TODO schmaelstes messen
 w2 = w1 - 2*24;
 length = 180;
 
@@ -126,7 +126,7 @@ num_side_walls = 3;
 
 side_wall_margin=5;
 side_wall_square_wall=4;
-side_wall_square_size=9;
+side_wall_square_size=10;
 $fn = 72;
 caddy(w1, w2, h1, h2, length, num_side_walls, wall, side_wall_margin, side_wall_square_size, side_wall_square_wall);
  
