@@ -13,6 +13,9 @@ In my workshop, a pipe close to a power outlet drips frequently (due to condensa
 ## spice-caddy
 Used to store baking stuff in a teabag caddy - wanted to have a larger one for the big spice (refill) bags, too.
 
+## suction-adapter
+Adapters to connect tools with the workshop suction.
+
 ## utils
 Handy stuff, I might want to reuse.
 
