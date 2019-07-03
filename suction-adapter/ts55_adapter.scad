@@ -61,8 +61,8 @@ module lock_negative(d_ts_lock, h_ts, h_ts1, h_ts2, thickness_lock, w_lock)
 module ts_suction_adapter(h_ts, h_ts1, h_ts2, d_ts, thickness_lock, w_lock, h_transition, h_suction, d_suction)
 {
     // Relative values
-    d_ts_lock = d_ts + thickness_lock + 0.5;
-    d_ts_outer = d_ts_lock + 1;
+    d_ts_lock = d_ts + 2*thickness_lock + 1;
+    d_ts_outer = d_ts_lock + 2;
     d_suction_inner = d_suction - thickness_lock - 1.5;
     
     // TS55
