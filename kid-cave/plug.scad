@@ -35,4 +35,4 @@ module cave_plug(plug_length_inside = 40,
     }
 }
 
-cave_plug(plug_length_inside=23.5, plug_cone_length_outside=2, screw_pitch=2, $fn=36);
+cave_plug(plug_length_inside=23.5, plug_cone_length_outside=2, plug_diameter_inside = 9.7, screw_pitch=2, $fn=36); // dia_inside=9.7 for front-left (needs to be a bit tighter, others are fine at 9.5)

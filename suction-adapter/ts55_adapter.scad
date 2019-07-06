@@ -13,8 +13,8 @@ w_lock = 13;
 
 h_transition = 15; // going from d_ts to d_suction
 
-h_suction = 30;
-d_suction = 32;
+h_suction = 30+40;
+d_suction = 32+0.9; // make it a bit tighter (33 yields a corrupt stl, for whatever reason) 33.1 is too big
 
 
 $fn = 72;
