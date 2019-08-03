@@ -19,17 +19,37 @@ module hexagon(diameter)
 }
 
 
+module _draw_honeycombs(initial_offset_x, x, initial_offset_y, y, step_x, step_y, diameter_comb)
+{
+    union()
+    {
+        for (offset_y = [0 : step_y : y+step_y], 
+            offset_x = [0 : step_x : x+step_x])
+        {
+            // Current row/column
+            translate([offset_x + initial_offset_x, offset_y + initial_offset_y])
+            hexagon(diameter_comb);
+            // The row/column before (our loop makes an additional iteration, so we'll cover everything!)
+            //translate([offset_x + initial_offset_x - diameter_comb*3/4 - wall_x, offset_y + initial_offset_y])
+            translate([offset_x + initial_offset_x - step_x/2, offset_y + initial_offset_y - step_y/2])
+            hexagon(diameter_comb);
+        }
+    }
+}
+
 /**
- * A centered 3D honeycomb pattern.
+ * A centered 2D honeycomb pattern.
  *
- * x, y, z 
- *     width, length, height
+ * x, y
+ *     width, length
  * diameter_comb
  *     diameter of a single comb (i.e. size of the hole)
  * wall
  *     thickness of the wall between two combs
+ * negative
+ *     set to true if you want to subtract the combs yourself (maybe from a custom shape)
  */
-module honeycomb_pattern(x, y, z, diameter_comb, wall, center=true)
+module honeycomb_pattern2d(x, y, diameter_comb, wall, center=true, negative=false)
 {
     /**
      * Note: The following visualization is optimized for the OpenSCAD editor.
@@ -85,22 +105,40 @@ module honeycomb_pattern(x, y, z, diameter_comb, wall, center=true)
     rem_y = y - num_full_y * step_y;
     initial_offset_y = (center ? -y/2 : 0) + rem_y/2;
 
-    // Draw in 2D first, then extrude (more accurate)
-    linear_extrude(height=z, center=center)
-    // Draw filled hexagons, subtract from a solid rectangle:
-    difference()
+    if (negative)
     {
-        square([x, y], center=center);
-        for (offset_y = [0 : step_y : y+step_y], 
-            offset_x = [0 : step_x : x+step_x])
+        intersection()
         {
-            // Current row/column
-            translate([offset_x + initial_offset_x, offset_y + initial_offset_y])
-            hexagon(diameter_comb);
-            // The row/column before (our loop makes an additional iteration, so we'll cover everything!)
-            //translate([offset_x + initial_offset_x - diameter_comb*3/4 - wall_x, offset_y + initial_offset_y])
-            translate([offset_x + initial_offset_x - step_x/2, offset_y + initial_offset_y - step_y/2])
-            hexagon(diameter_comb);
+            square([x, y], center=center);
+            _draw_honeycombs(initial_offset_x, x, initial_offset_y, y, step_x, step_y, diameter_comb);
         }
     }
+    else
+    {
+        // Draw filled hexagons, subtract from a solid rectangle:
+        difference()
+        {
+            square([x, y], center=center);
+            _draw_honeycombs(initial_offset_x, x, initial_offset_y, y, step_x, step_y, diameter_comb);
+        }
+    }
+}
+
+/**
+ * A centered 3D honeycomb pattern.
+ *
+ * x, y, z 
+ *     width, length, height
+ * diameter_comb
+ *     diameter of a single comb (i.e. size of the hole)
+ * wall
+ *     thickness of the wall between two combs
+ * negative
+ *     set to true if you want to subtract the combs yourself (maybe from a custom shape)
+ */
+module honeycomb_pattern(x, y, z, diameter_comb, wall, center=true, negative=false)
+{
+    // Draw in 2D first, then extrude (more accurate)
+    linear_extrude(height=z, center=center)
+    honeycomb_pattern2d(x, y, diameter_comb, wall, center, negative);
 }

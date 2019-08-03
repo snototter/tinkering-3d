@@ -13,13 +13,13 @@ w_lock = 13;
 
 h_transition = 15; // going from d_ts to d_suction
 
-h_suction = 30+40;
-d_suction = 32+0.9; // make it a bit tighter (33 yields a corrupt stl, for whatever reason) 33.1 is too big
-
+h_suction = 40;
+d_suction1 = 33.3;//32+0.9; // make it a bit tighter (33 yields a corrupt stl, for whatever reason) 33.1 is too big
+d_suction2 = 31.7; // top end
 
 $fn = 72;
 
-ts_suction_adapter(h_ts, h_ts1, h_ts2, d_ts, thickness_lock, w_lock, h_transition, h_suction, d_suction);
+ts_suction_adapter(h_ts, h_ts1, h_ts2, d_ts, thickness_lock, w_lock, h_transition, h_suction, d_suction1, d_suction2);
 
 // D(iameter cylinder)
 // H(eight cylinder)
@@ -58,12 +58,13 @@ module lock_negative(d_ts_lock, h_ts, h_ts1, h_ts2, thickness_lock, w_lock)
     }
 }
 
-module ts_suction_adapter(h_ts, h_ts1, h_ts2, d_ts, thickness_lock, w_lock, h_transition, h_suction, d_suction)
+module ts_suction_adapter(h_ts, h_ts1, h_ts2, d_ts, thickness_lock, w_lock, h_transition, h_suction, d_suction1, d_suction2)
 {
     // Relative values
     d_ts_lock = d_ts + 2*thickness_lock + 1;
-    d_ts_outer = d_ts_lock + 2;
-    d_suction_inner = d_suction - thickness_lock - 1.5;
+    d_ts_outer = d_ts_lock + 2*2;
+    d_suction_inner1 = d_suction1 - thickness_lock - 1.5;
+    d_suction_inner2 = d_suction2 - thickness_lock - 1.5;
     
     // TS55
     union()
@@ -88,54 +89,12 @@ module ts_suction_adapter(h_ts, h_ts1, h_ts2, d_ts, thickness_lock, w_lock, h_tr
         
         // Transition / Rejuvenation
         translate([0, 0, h_ts])
-        rejuvenating_pipe(d_ts_outer, d_suction, d_ts, d_suction_inner, h_transition, center=false);
+        rejuvenating_pipe(d_ts_outer, d_suction1, d_ts, d_suction_inner1, h_transition, center=false);
         
         // Suction adapter
         translate([0, 0, h_ts + h_transition])
-        pipe(d_suction, d_suction_inner, h_suction, center=false);
+        rejuvenating_pipe(d_suction1, d_suction2, d_suction_inner1, d_suction_inner2, h_suction, center=false);
+        //pipe(d_suction1, d_suction_inner1, h_suction, center=false);
     }
-    /*difference()
-    {
-        translate([0, 0, h_ts])
-        cylinder(d1 = d_ts_outer, d2 = d_suction, h = h_transition, center = false);
-        
-        union()
-        {
-            cylinder(d = d_ts, h = h_ts, center = false); // used to cut the TS55 inner parts
-            translate([0, 0, h_ts])
-            cylinder(d1 = d_ts, d2 = d_suction_inner, h = h_transition, center=false); 
-            cylinder(d = d_suction_inner, h = h_ts + h_transition + 2); // used to cut the suction inner parts 
-        }
-    }*/
 }
-/*module ts_suction_adapter(diameter_ts, diameter_suction, height_ts, height_suction, lock_thickness, lock_width, lock_height, lock_dive, epsilon=0.5)
-{
-    //d_min = min(diameter_ts, diameter_suction);
-    //h_total = height_ts + height_suction;
-    d_ts_out = diameter_ts + lock_thickness + 1 + epsilon;
-    
-    // TS55
-    //mirror([0, 0, 1])
-    difference()
-    {
-        //translate([0, 0, height_ts/2])
-        //cylinder(d = d_ts_out, h = height_ts, center = true);
-        
-        //translate([0, 0, height_ts - lock_dive - lock_height - epsilon])
-        lock_negative(diameter_ts + epsilon, lock_width + epsilon, lock_height + epsilon, lock_thickness + epsilon, lock_dive+1);
-        
-        //translate([0, 0, height_ts/2])
-        //cylinder(d = diameter_ts + epsilon, h = height_ts + 2, center = true);
-    }
-  */  
-    // suction
-    /*translate([0, 0, height_suction/2 + height_ts])
-    difference()
-    {
-        cylinder(d = diameter_suction - epsilon/2, h = height_suction, center = true);
-        cylinder(d = diameter_suction - 3, h = height_suction+2, center = true);
-    }*/
-    
-    
-//}
 
