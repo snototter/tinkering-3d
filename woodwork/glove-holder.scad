@@ -1,5 +1,6 @@
 use <../utils/pattern_honeycomb.scad>
 use <../utils/polygons.scad>
+use <../utils/screw_it.scad>
 
 // Set to true if you change the dimensions: this will show the final box with extruded screw cylinders (allowing you to adjust the screw_placeholders within the body() module!)
 DEBUG=false;
@@ -111,10 +112,7 @@ module sidewall(width, depth1, depth2, height, wall_thickness, margin_x, margin_
 module screw_placeholder(diameter, wall_thickness)
 {
     $fn = 36;
-    translate([0, 0, -1])
-    cylinder(d=diameter, h=wall_thickness+2, center=false);
-    if (DEBUG)
-        cylinder(d=diameter, h=wall_thickness+70, center=false);
+    countersunk_screw_cutout(5, 4, diameter, 2*diameter, epsilon=1);
 }
 
 module body(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, honeycomb_dia, honeycomb_wall, back_height1, back_height2, tilt_angle, front_length, screw_dia1, screw_dia2)
@@ -138,26 +136,43 @@ module body(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, h
             honeycombed_polygon(floor_corners, wall_thickness, honeycomb_dia, honeycomb_wall, max(margin_x, margin_y));
             
             // Back top
-            translate([0, height-back_height1, 0])
-            cube([width, back_height1, wall_thickness], center=false);
+            difference()
+            {
+                translate([0, height-back_height1, 0])
+                cube([width, back_height1, wall_thickness], center=false);
+                
+                translate([width*0.15, height-back_height1/2.0-2.5, 0])
+                screw_placeholder(screw_dia1, wall_thickness);
+                translate([width*0.85, height-back_height1/2.0-2.5, 0])
+                screw_placeholder(screw_dia1, wall_thickness);
+            }
             
-            translate([width*0.15, height-back_height1/2.0-2.5, 0])
-            #screw_placeholder(screw_dia1, wall_thickness);
-            translate([width*0.85, height-back_height1/2.0-2.5, 0])
-            #screw_placeholder(screw_dia1, wall_thickness);
-            
-            //TODO diff mit schraubenloch!
-            //TODO util schraubenloch (verjuengend)
-            //TODO connectors
-            //TODO schrauben abmessen
+            if (DEBUG)
+            {
+                $fn = 72;
+                // Show cylinder where the screw should be to align honeycomb pattern with screw cutouts
+                translate([width*0.15, height-back_height1/2.0-2.5, -10])
+                #cylinder(d=diameter, h=wall_thickness+70, center=false);
+                translate([width*0.85, height-back_height1/2.0-2.5, -10])
+                #cylinder(d=diameter, h=wall_thickness+70, center=false);
+            }
             //TODO sidewall solid!
             
             
             // Back bottom
-            cube([width, back_height2, wall_thickness], center=false);
+            difference()
+            {
+                cube([width, back_height2, wall_thickness], center=false);
 
-            translate([width/2.0, back_height2/2.0 + 4, 0])
-            #screw_placeholder(screw_dia1, wall_thickness);
+                translate([width/2.0, back_height2/2.0 + 4, 0])
+                screw_placeholder(screw_dia1, wall_thickness);
+            }
+            if (DEBUG)
+            {
+                $fn = 72;
+                translate([width/2.0, back_height2/2.0 + 4, -10])
+                #cylinder(d=diameter, h=wall_thickness+70, center=false);
+            }
         }
         
         // Transform the front wall connector cutouts into place
@@ -194,10 +209,9 @@ module glove_holder(width=90, depth1=20, depth2=40, height=110, wall_thickness=2
         tilt_angle, L, screw_dia1, screw_dia2);
     
     
-    // Dummy!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //TODO make dummy front - rotate + translate onto body; CHECK where the holes should be!!!
     if (DEBUG)
     {
+        // Show a dummy front properly aligned with the body
         translate([0, 0, depth1+2])
         rotate([tilt_angle, 0, 0])
         translate([width/2.0, L/2.0, wall_thickness])
