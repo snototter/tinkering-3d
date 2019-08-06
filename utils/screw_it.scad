@@ -4,6 +4,36 @@ $fn=36;
 translate([50, 0, 0])
 screw_foot(20, 50, 5, 4.5, 7, 3);
 
+countersunk_screw_cutout(16.5, 4, 4, 7.9, epsilon=1); // Spax 4x16
+
+// Cutout for countersunk screws.
+// Takes care of the top/bottom padding needed when subtracting shapes
+module countersunk_screw_cutout(height_total, height_head, diameter_screw, diameter_head, , epsilon=1)
+{
+    // Requires OpenSCAD 2019.05 assert(height_head + 1 <= height_total, "Total height must be at least head + 1");
+    $fn = 72;
+    height_screw = height_total - height_head;
+    translate([0, 0, -epsilon])
+    cylinder(d=diameter_screw, h=height_screw+epsilon+height_head/2.0, center=false); // +height_head/2 to ensure connected shape
+    
+    if (epsilon > 0)
+    {
+        // Compute diameter for epsilon-padded height (similar triangles to the rescue)
+        r1 = diameter_screw/2.0;
+        r2 = diameter_head/2.0;
+        r_ext = r1 + (height_head + epsilon) * (r2 - r1) / height_head;
+        
+        translate([0, 0, height_screw])
+        cylinder(d1=diameter_screw, d2=2*r_ext, h=height_head+epsilon, center=false);
+    }
+    else
+    {
+        translate([0, 0, height_screw])
+        cylinder(d1=diameter_screw, d2=diameter_head, h=height_head, center=false);
+    }
+}
+
+// "Lasche" - simple extension for a model to tighten it via screws - has a rounded top + countersunk screw cutout
 module screw_foot(width, length, height, diameter_screw, diameter_countersunk, height_countersunk)
 {
     cube_length = length - width / 2;
