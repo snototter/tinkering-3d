@@ -1,6 +1,8 @@
 use <../utils/pattern_honeycomb.scad>
 use <../utils/polygons.scad>
 
+// Set to true if you change the dimensions: this will show the final box with extruded screw cylinders (allowing you to adjust the screw_placeholders within the body() module!)
+DEBUG=false;
 module honeycombed_wall(x, y, z, diameter_comb, wall_comb, margin_x, margin_y)
 {
     difference()
@@ -19,23 +21,7 @@ function rect_size(x1, y1, x2, y2) = [x2-x1, y2-y1];
 function front_angle(depth1, depth2, height) = atan2((depth2-depth1), height);
 
 module honeycombed_polygon(points_xy, z, diameter_comb, wall_comb, margin)
-{
-    //linear_extrude(height=z)
-    
-    //offset(delta=-margin)
-   // polygon(points=points_xy, convexity=1);
-    //honeycomb_pattern2d(
-    /*for (i = [0 : 1 : len(points_xy)-1])
-    {
-        echo("point");
-        echo(points_xy[i]);
-        echo(minx(points_xy));
-        echo(miny(points_xy));
-        echo(maxx(points_xy));
-        echo(maxy(points_xy));
-    }*/
-    //bounding_rect(points_xy);
-    
+{    
     min_x = minx(points_xy);
     max_x = maxx(points_xy);
     min_y = miny(points_xy);
@@ -61,54 +47,106 @@ module honeycombed_polygon(points_xy, z, diameter_comb, wall_comb, margin)
     }
 }
 
-module front_wall(width, height, wall_thickness, margin_x, margin_y, height, label_width, label_height)
+module front_wall(width, height, wall_thickness, margin_x, margin_y, label_width, label_height, honeycomb_dia, honeycomb_wall)
 {
     union()
     {
-        //TODO comp height from angle!
         translate([0, 0, wall_thickness/2])
-        honeycombed_wall(x=width, y=height, z=wall_thickness, diameter_comb=7, wall_comb=2, margin_x=margin_x, margin_y=margin_y);
+        honeycombed_wall(x=width, y=height, z=wall_thickness, diameter_comb=honeycomb_dia, wall_comb=honeycomb_wall, margin_x=margin_x, margin_y=margin_y);
         
-        translate([0, 0.2*height, wall_thickness/2])
+        translate([0, 0.15*height, wall_thickness/2])
         cube([label_width, label_height, wall_thickness], center=true);
     }
 }
 
-module glove_holder(width=90, depth1=15, depth2=30, height=60, wall_thickness=1, margin_x=7, margin_y=5)
-//module glove_holder(width=90, depth1=15, depth2=15, height=60, wall_thickness=1, margin_x=7, margin_y=5)
+module sidewall(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, honeycomb_dia, honeycomb_wall)
 {
-    // Make separate body and bottom (prefer glue over support issues)
-    // Body -------------------------------------------------
-    // Front wall
-    label_width= 55; //TODO
-    label_height = 12; //TODO
-    
-    hc_diameter = 7;
-    hc_wall = 2;
     side_corners = [[0, 0], [depth1, 0], [depth2, height], [0, height]];
     angle = front_angle(depth1, depth2, height);
-    length_tilted = distance2d_pts(side_corners[1], side_corners[2]) + wall_thickness;
-    
-    //honeycombed_polygon(side_corners, wall_thickness, hc_diameter, hc_wall, min(margin_x, margin_y));
-    
-    /////// Front wall with label
-    translate([0, height/2, 0])
-    front_wall(width, length_tilted, wall_thickness, margin_x, margin_y, height, label_width, label_height);
-    
-    translate([-(width/2-wall_thickness/2), 0, 0])
-    rotate([angle, 0, 0])
-    //TODO bodenplatte hier einfuegen
-    translate([0, 0, depth1])
-    rotate([0, 90, 0])
-    honeycombed_polygon(side_corners, wall_thickness, hc_diameter, hc_wall, min(margin_x, margin_y));
-    
-    // Obere Abdeckung (Dummy fuer Cropping)
-    translate([-width/2, height, 0])
-    rotate([angle, 0, 0])
-    cube([width, wall_thickness, depth2], center=false);
-    
+    rotate([0, -90, 0])
+    honeycombed_polygon(side_corners, wall_thickness, honeycomb_dia, honeycomb_wall, max(margin_x, margin_y));
 }
 
+module screw_placeholder(diameter, wall_thickness)
+{
+    $fn = 36;
+    translate([0, 0, -1])
+    cylinder(d=diameter, h=wall_thickness+2, center=false);
+    if (DEBUG)
+        cylinder(d=diameter, h=wall_thickness+70, center=false);
+}
 
+module body(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, honeycomb_dia, honeycomb_wall, back_height1, back_height2, screw_dia1, screw_dia2)
+{
+    union()
+    {
+        // Left wall
+        translate([wall_thickness/2.0, 0, 0])
+        sidewall(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, honeycomb_dia, honeycomb_wall);
+        
+        // Right wall
+        translate([width-wall_thickness/2.0, 0, 0])
+        sidewall(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, honeycomb_dia, honeycomb_wall);
+        
+        // Floor
+        floor_corners = [[0, 0], [width, 0], [width, depth1], [0, depth1]];
+        translate([0, wall_thickness/2.0, 0])
+        rotate([90, 0, 0])
+        honeycombed_polygon(floor_corners, wall_thickness, honeycomb_dia, honeycomb_wall, max(margin_x, margin_y));
+        
+        // Back top
+        translate([0, height-back_height1, 0])
+        cube([width, back_height1, wall_thickness], center=false);
+        
+        translate([width*0.15, height-back_height1/2.0-2.5, 0])
+        #screw_placeholder(screw_dia1, wall_thickness);
+        translate([width*0.85, height-back_height1/2.0-2.5, 0])
+        #screw_placeholder(screw_dia1, wall_thickness);
+        
+        //TODO diff mit schraubenloch!
+        //TODO schrauben abmessen
+        
+        
+        // Back bottom
+        cube([width, back_height2, wall_thickness], center=false);
+
+        translate([width/2.0, back_height2/2.0 + 4, 0])
+        #screw_placeholder(screw_dia1, wall_thickness);
+    }
+}
+
+module glove_holder(width=90, depth1=20, depth2=40, height=110, wall_thickness=2,
+    margin_x=6, margin_y=6,
+    honeycomb_diameter=7, honeycomb_wall_thickness=3,
+    label_width=60, label_height=15,
+    back_height1=25, back_height2=22)
+{
+    screw_dia1 = 4;
+    screw_dia2 = 8;
+    // Compute values
+    depth_offset = depth2 - depth1;
+    L = sqrt(height*height + depth_offset*depth_offset);
+    part_distance = 5;
+    
+    // Separate front (will be glued on)
+    translate([width*1.5 + part_distance, L/2.0, 0])
+    front_wall(width, L, wall_thickness, margin_x, margin_y, label_width, label_height, honeycomb_diameter, honeycomb_wall_thickness);
+    
+    
+    // Next to it the body:
+    body(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, honeycomb_diameter, honeycomb_wall_thickness, back_height1, back_height2,
+        screw_dia1, screw_dia2);
+    
+    
+    // Dummy!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //TODO make dummy front - rotate + translate onto body; CHECK where the holes should be!!!
+    if (DEBUG)
+    {
+        translate([0, 0, depth1])
+        rotate([front_angle(depth1, depth2, height), 0, 0])
+        translate([width/2.0, L/2.0, 0])
+        %front_wall(width, L, wall_thickness, margin_x, margin_y, label_width, label_height, honeycomb_diameter, honeycomb_wall_thickness);
+    }
+}
 
 glove_holder();
