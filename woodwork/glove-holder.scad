@@ -4,6 +4,7 @@ use <../utils/screw_it.scad>
 
 // Set to true if you change the dimensions: this will show the final box with extruded screw cylinders (allowing you to adjust the screw_placeholders within the body() module!)
 DEBUG=false;
+COMBED_BODY=false;
 module honeycombed_wall(x, y, z, diameter_comb, wall_comb, margin_x, margin_y)
 {
     difference()
@@ -101,12 +102,23 @@ module front_wall(width, height, wall_thickness, margin_x, margin_y, label_width
     }
 }
 
-module sidewall(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, honeycomb_dia, honeycomb_wall)
+module sidewall_combed(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, honeycomb_dia, honeycomb_wall)
 {
     side_corners = [[0, 0], [depth1, 0], [depth2, height], [0, height]];
     angle = front_angle(depth1, depth2, height);
     rotate([0, -90, 0])
     honeycombed_polygon(side_corners, wall_thickness, honeycomb_dia, honeycomb_wall, max(margin_x, margin_y));
+}
+
+module sidewall_solid(width, depth1, depth2, height, wall_thickness)
+{
+    side_corners = [[0, 0], [depth1, 0], [depth2, height], [0, height]];
+    angle = front_angle(depth1, depth2, height);
+    rotate([0, -90, 0])
+    linear_extrude(height=wall_thickness, center=true)
+    {
+        polygon(points=side_corners, convexity=1);
+    }
 }
 
 module screw_placeholder(diameter, wall_thickness)
@@ -123,17 +135,41 @@ module body(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, h
         {
             // Left wall
             translate([wall_thickness/2.0, 0, 0])
-            sidewall(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, honeycomb_dia, honeycomb_wall);
+            if (COMBED_BODY)
+            {
+                sidewall_combed(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, honeycomb_dia, honeycomb_wall);
+            }
+            else
+            {
+                sidewall_solid(width, depth1, depth2, height, wall_thickness);
+            }
             
             // Right wall
             translate([width-wall_thickness/2.0, 0, 0])
-            sidewall(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, honeycomb_dia, honeycomb_wall);
+            if (COMBED_BODY)
+            {
+                sidewall_combed(width, depth1, depth2, height, wall_thickness, margin_x, margin_y, honeycomb_dia, honeycomb_wall);
+            }
+            else
+            {
+                sidewall_solid(width, depth1, depth2, height, wall_thickness);
+            }
             
             // Floor
             floor_corners = [[0, 0], [width, 0], [width, depth1], [0, depth1]];
             translate([0, wall_thickness/2.0, 0])
             rotate([90, 0, 0])
-            honeycombed_polygon(floor_corners, wall_thickness, honeycomb_dia, honeycomb_wall, max(margin_x, margin_y));
+            if (COMBED_BODY)
+            {
+                honeycombed_polygon(floor_corners, wall_thickness, honeycomb_dia, honeycomb_wall, max(margin_x, margin_y));
+            }
+            else
+            {
+                linear_extrude(height=wall_thickness, center=true)
+                {
+                    polygon(points=floor_corners, convexity=1);
+                }
+            }
             
             // Back top
             difference()
