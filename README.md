@@ -30,4 +30,4 @@ Some things need to be modelled precisely before building it in my makerspace - 
 ## gardening
 Anything that simplifies my gardening work, holds tools, connects stuff, etc.
 * Plug holder for the electricity cable reel (the original one is crap since the plug falls out while reeling)
-![](gardening/reeling.jpg)
+![](gardening/plug-holder-cable-reel.jpg)
