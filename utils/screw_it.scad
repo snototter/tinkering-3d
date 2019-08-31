@@ -6,6 +6,20 @@ screw_foot(20, 50, 5, 4.5, 7, 3);
 
 countersunk_screw_cutout(16.5, 4, 4, 7.9, epsilon=1); // Spax 4x16
 
+// Nut traps ("Hutkappe" fuer Sechskantschrauben)
+module nut_trap(s, h, epsilon=0.1)
+{
+    // Compute the radius via equilateral triangles
+    // height (i.e. s/2) = sqrt(3)/2 * side (i.e. the radius)
+    cylinder(r = s / sqrt(3) + epsilon/2, h=h, $fn=6);
+}
+module nut_trap_m3(height, epsilon=0.1) { nut_trap(5.5, height, epsilon); }
+module nut_trap_m4(height=3.2, epsilon=0.1) { nut_trap(7, height, epsilon); }
+module nut_trap_m5(height, epsilon=0.1) { nut_trap(8, height, epsilon); }
+module nut_trap_m6(height, epsilon=0.1) { nut_trap(10, height, epsilon); }
+module nut_trap_m8(height, epsilon=0.1) { nut_trap(13, height, epsilon); }
+module nut_trap_m10(height, epsilon=0.1) { nut_trap(17, height, epsilon); }
+
 // Cutout for countersunk screws.
 // Takes care of the top/bottom padding needed when subtracting shapes
 module countersunk_screw_cutout(height_total, height_head, diameter_screw, diameter_head, , epsilon=1)
