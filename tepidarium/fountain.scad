@@ -2,7 +2,7 @@
 $fn = 72;
 diameter=103;//95;
 h_feet = 47;
-h_base = 7;
+h_base = 5;
 
 module base(diameter)
 {
@@ -32,8 +32,27 @@ module cutout(h, w, r, thickness)
     }
 }
 
-
-
+module rcube(xyz, r)
+{
+    a = xyz[0];
+    b = xyz[1];
+    h = xyz[2];
+    
+    hull()
+    {
+        translate([-a/2+r, -b/2+r, 0])
+        cylinder(r=r, h=h);
+        
+        translate([a/2-r, -b/2+r, 0])
+        cylinder(r=r, h=h);
+        
+        translate([-a/2+r, b/2-r, 0])
+        cylinder(r=r, h=h);
+        
+        translate([a/2-r, b/2-r, 0])
+        cylinder(r=r, h=h);
+    }
+}
 
 difference()
 {
@@ -50,30 +69,24 @@ difference()
         linear_extrude(height = h_base+h_feet)
         {
             translate([0, diameter/2])
-            scale(v = [0.5, 0.5])
+            scale(v = [0.6, 0.6])
             base(diameter);
         }
     }
     
-    // Carve away pump
-    translate([-5, 63, -1])
-    rotate([0, 0, 35])
-    union()
-    {
-        cylinder(d=15, h=80);
-        translate([-15/2, -15/2, 0])
-        cube([45, 50, 70]);
-    }
+    // Carve holes for light and pump
+    translate([0, 25+65/2, -1])
+    rcube([35, 65, h_base+h_feet+2], 10);
     
-    // Carve away light
-    dlight = 35;
-    translate([0, 38+dlight/2, -1])
-    cylinder(d=dlight, h=80);
+    
     
     // Carve away cables for pump
-    translate([-35, 105, h_base+h_feet-25])
-    rotate([0, 0, 35])
-    cutout(26, 30, 6, 80);
+    translate([-24.5, 115, h_base+h_feet-25])
+    cutout(26, 15, 6, 40);
+    
+    // Carve away pump
+    translate([-52/2+20, 115-52/2, h_base])
+    rcube([52, 52, h_feet+1], 10);
     
     // Carve away ultrasound fog machine...
     translate([30, 50, h_base])
@@ -89,13 +102,14 @@ difference()
     rotate([0, 0, 90])
     cutout(h_feet+1, w_cutout, 6, 150);
     
-    translate([0, 115/2+w_cutout/4, h_base])
+    translate([-75, 115/2+w_cutout/4, h_base])
     rotate([0, 0, 90])
     cutout(h_feet+1, w_cutout, 6, 150);
 
     translate([0, 115-31+w_cutout/2, h_base])
     rotate([0, 0, 90])
     cutout(h_feet+1, w_cutout, 6, 150);
+    
 
 }
 
@@ -103,38 +117,11 @@ difference()
 translate([0, -14, 0])
 difference()
 {
-    light_cable_width = 3.5;
-    cylinder(d1=18, d2=16, h=15);
+    douter=22;
+    height=18;
+    light_cable_width = 3.45;
+    cylinder(d1=douter, d2=16, h=height);
 
     translate([-light_cable_width/2, 0, -1])
-    cube([light_cable_width, 10, 17]); 
-}
-/*translate([0, diameter/2])
-linear_extrude(height = 46)
-{
-    difference()
-    {
-        base(diameter);
-        scale(v = [0.8, 0.8])
-        base(diameter);
-    }
-}*/
-
-/*difference()
-{
-    linear_extrude(height = 5)
-    {
-        translate([0, diameter/2])
-        base(diameter);
-    }
-
-    // Pump cutout
-    translate([-3, 65, -1])
-    rotate([0, 0, 35])
-    union()
-    {
-        cylinder(d=15, h=80);
-        translate([-15/2, -15/2, 0])
-        cube([42, 47, 70]);
-    }
+    cube([light_cable_width, douter/2+1, height+2]); 
 }
