@@ -1,17 +1,24 @@
-/* Stand for the fountain in our tepidarium */
+/* Stand for the fountain in our tepidarium 
+v1 - quick hack, night session
+v2 - adjust cutouts
+v3 - circular base plate (the ultrasonic mist blower is too strong and needs a top cover) + bottom cover with connectors + 2 separate STLs for printing
+*/
 $fn = 72;
-diameter=103;//95;
+diameter=120;//103;
 h_feet = 47;
 h_base = 5;
+BOTTOM = false;
 
 module base(diameter)
 {
-hull()
+//    translate([0, 3+diameter/2]) 
+    circle(d=diameter);
+/*hull()
     {
         circle(r = diameter/2);
         translate([0, 23])
         circle(r = diameter/2);
-    }
+    }*/
 }
 
 module cutout(h, w, r, thickness)
@@ -54,74 +61,99 @@ module rcube(xyz, r)
     }
 }
 
-difference()
+if (BOTTOM)
 {
-    // Platform for the fountain (stone), extrude full body and carve away later
-    difference()
+    // Bottom plate with connectors
+    union()
     {
-        linear_extrude(height = h_base+h_feet)
+        linear_extrude(height = 2)
         {
-            translate([0, diameter/2])
+            translate([0, 3+diameter/2])
             base(diameter);
         }
         
-        translate([0, 0, h_base])
-        linear_extrude(height = h_base+h_feet)
-        {
-            translate([0, diameter/2])
-            scale(v = [0.6, 0.6])
-            base(diameter);
-        }
+        translate([20, 15, 2])
+        cylinder(d=6, h=10);
+        
+        translate([-27, 108, 2])
+        cylinder(d=6, h=10);
     }
     
-    // Carve holes for light and pump
-    translate([0, 25+65/2, -1])
-    rcube([35, 65, h_base+h_feet+2], 10);
-    
-    
-    
-    // Carve away cables for pump
-    translate([-24.5, 115, h_base+h_feet-25])
-    cutout(26, 15, 6, 40);
-    
-    // Carve away pump
-    translate([-52/2+20, 115-52/2, h_base])
-    rcube([52, 52, h_feet+1], 10);
-    
-    // Carve away ultrasound fog machine...
-    translate([30, 50, h_base])
-    rotate([0, 0, 75])
-    cutout(h_feet+1, h_feet, 6, 50);
-    
-    // Cutouts for water flow
-    w_cutout = 18;
-    translate([0, 150/2-1, h_base])
-    cutout(h_feet+1, w_cutout, 6, 150);
-    
-    translate([0, 31, h_base])
-    rotate([0, 0, 90])
-    cutout(h_feet+1, w_cutout, 6, 150);
-    
-    translate([-75, 115/2+w_cutout/4, h_base])
-    rotate([0, 0, 90])
-    cutout(h_feet+1, w_cutout, 6, 150);
+    // Light plug (so we can adjust its z position inside the fountain stone)
+    translate([0, -14, 0])
+    difference()
+    {
+        douter=22;
+        height=18;
+        light_cable_width = 3.45;
+        cylinder(d1=douter, d2=16, h=height);
 
-    translate([0, 115-31+w_cutout/2, h_base])
-    rotate([0, 0, 90])
-    cutout(h_feet+1, w_cutout, 6, 150);
-    
-
+        translate([-light_cable_width/2, 0, -1])
+        cube([light_cable_width, douter/2+1, height+2]); 
+    }
 }
-
-// Light plug (so we can adjust its z position inside the fountain stone)
-translate([0, -14, 0])
-difference()
+else
 {
-    douter=22;
-    height=18;
-    light_cable_width = 3.45;
-    cylinder(d1=douter, d2=16, h=height);
 
-    translate([-light_cable_width/2, 0, -1])
-    cube([light_cable_width, douter/2+1, height+2]); 
+    difference()
+    {
+        // Platform for the fountain (stone), extrude full body and carve away later
+        difference()
+        {
+            linear_extrude(height = h_base+h_feet)
+            {
+                translate([0, 3+diameter/2])
+                base(diameter);
+            }
+            
+            translate([0, 0, h_base])
+            linear_extrude(height = h_base+h_feet)
+            {
+                translate([0, 3+diameter/2])
+                scale(v = [0.6, 0.6])
+                base(diameter);
+            }
+        }
+        
+        // Carve holes for light and pump
+        translate([0, 25+65/2, -1])
+        rcube([35, 65, h_base+h_feet+2], 10);
+        
+        // Carve away cables for pump
+        translate([-24.5, 115, h_base+h_feet-25])
+        cutout(26, 15, 6, 40);
+        
+        // Carve away pump
+        translate([-52/2+20, 115-52/2, h_base])
+        rcube([52, 52, h_feet+1], 10);
+        
+        // Carve away ultrasound fog machine...
+        translate([20, 50, h_base])
+        rotate([0, 0, 90])
+        cutout(h_feet+1, h_feet+5, 6, 50);
+        
+        // Cutouts for water flow
+        w_cutout = 18;
+        translate([0, 150/2-1, h_base])
+        cutout(h_feet+1, w_cutout, 6, 150);
+        
+        translate([0, 31, h_base])
+        rotate([0, 0, 90])
+        cutout(h_feet+1, w_cutout, 6, 150);
+        
+        translate([0, 115/2+w_cutout/4, h_base])
+        rotate([0, 0, 90])
+        cutout(h_feet+1, w_cutout, 6, 150);
+
+        translate([0, 115-31+w_cutout/2, h_base])
+        rotate([0, 0, 90])
+        cutout(h_feet+1, w_cutout, 6, 150);
+        
+        // Carve away connectors
+        translate([-20, 15, h_base])
+        cylinder(d=6.1, h=h_feet+1);
+        
+        translate([27, 108, h_base])
+        cylinder(d=6.1, h=h_feet+1);
+    }
 }
