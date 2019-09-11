@@ -5,9 +5,11 @@ v3 - circular base plate (the ultrasonic mist blower is too strong and needs a t
 */
 $fn = 72;
 diameter=120;//103;
+diameter_extended= 145;//125+36/83*49;
 h_feet = 47;
 h_base = 5;
 BOTTOM = false;
+MIST_CUTOUTS = false;
 
 module base(diameter)
 {
@@ -94,18 +96,25 @@ if (BOTTOM)
 }
 else
 {
-
     difference()
     {
         // Platform for the fountain (stone), extrude full body and carve away later
         difference()
         {
-            linear_extrude(height = h_base+h_feet)
+            union()
             {
-                translate([0, 3+diameter/2])
-                base(diameter);
+                linear_extrude(height = h_base)
+                {
+                    translate([0, 3+diameter/2])
+                    base(diameter_extended);
+                }
+                linear_extrude(height = h_base+h_feet)
+                {
+                    translate([0, 3+diameter/2])
+                    base(diameter);
+                }
             }
-            
+                
             translate([0, 0, h_base])
             linear_extrude(height = h_base+h_feet)
             {
@@ -155,5 +164,26 @@ else
         
         translate([27, 108, h_base])
         cylinder(d=6.1, h=h_feet+1);
+        
+        
+        // Mist cut outs
+        if (MIST_CUTOUTS)
+        {
+            translate([0, 3+diameter/2, 0])
+            union()
+            {
+                dia_hole = 8;
+                angle_step = 360 / 12;
+                for (angle = [0 : angle_step : 359])
+                {
+                    //translate([diameter2/2-dia_hole/2-2, 0, -1])
+                    rotate([0, 0, angle])
+                    translate([diameter/2+dia_hole/2, 0, -1])
+                    cylinder(d=dia_hole, h=h_base+h_feet+2);
+
+
+                }
+            }
+        }
     }
 }
