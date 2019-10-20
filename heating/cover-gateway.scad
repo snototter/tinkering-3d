@@ -28,14 +28,49 @@ module cornered_cylinder(d, h, corner1=true, corner2=true, corner3=true, corner4
 epsilon = 0.2;
 height_connectors = 10;
 thickness = 3; // Wandstärke
+width = 160; // x
+length = 160; // y
+height = 15*2+27;
+
+
+module cover()
+{
+    cover_thickness = 2;
+    
+    difference()
+    {
+        union()
+        {
+            translate([-thickness, -thickness, 0])
+            cube([width+2*thickness, length+2*thickness, cover_thickness]);
+            
+            // Stützen für Abdeckung
+            //TODO epsilon
+            translate([thickness+epsilon, thickness+epsilon, cover_thickness])
+            cornered_cylinder(d=8, h=height_connectors, corner4=false);
+            translate([thickness+epsilon, length-thickness-epsilon, cover_thickness])
+            cornered_cylinder(d=8, h=height_connectors, corner3=false);
+            translate([width-thickness-epsilon, length-thickness-epsilon, cover_thickness])
+            cornered_cylinder(d=8, h=height_connectors, corner2=false);
+            translate([width-thickness-epsilon, thickness+epsilon, cover_thickness])
+            cornered_cylinder(d=8, h=height_connectors, corner1=false);
+            
+            // Kaltgerätestecker
+            translate([width-4, 8+epsilon, cover_thickness])
+            cube([thickness+4, 48-2*epsilon, 15]);
+        }
+        
+        //TODO check: pi rotlicht zu störend? smiley, honeycomb, etc? position genau ausmessen!
+        translate([width-30, length-30, -1])
+        cube([20,20,cover_thickness+2]);
+    }
+}
+
+translate([width+30, 0, 0])
+cover();
 
 module base()
 {
-    width = 160; // x
-    length = 160; // y
-    height = 15*2+27;
-    
-
     difference()
     {
         union()
@@ -107,9 +142,8 @@ module base()
         honeycomb_pattern(50, hc_length, thickness+2, 7, 3, center=true, negative=true);
 
         // Aussparung für Kaltgerätestecker
-        translate([-thickness-1, 8, thickness+15])
-        cube([thickness+2, 48, 27]);
-        // TODO dummy: 
+        //translate([-thickness-1, 8, thickness+15])
+        //cube([thickness+2, 48, 27]);
         translate([-thickness-1, 8, thickness+15])
         cube([thickness+2, 48, height]);
 
