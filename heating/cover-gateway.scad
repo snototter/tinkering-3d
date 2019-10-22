@@ -36,6 +36,7 @@ height = 15*2+27;
 module cover()
 {
     cover_thickness = 2;
+    //TODO epsilon zu klein? abmessen!
     
     difference()
     {
@@ -55,9 +56,13 @@ module cover()
             translate([width-thickness-epsilon, thickness+epsilon, cover_thickness])
             cornered_cylinder(d=8, h=height_connectors, corner1=false);
             
+            //TODO
             // Kaltgerätestecker
             translate([width-4, 8+epsilon, cover_thickness])
             cube([thickness+4, 48-2*epsilon, 15]);
+            //TODO höhe abmessen!
+            translate([width-6, 7+epsilon, cover_thickness])
+            cube([6, 60, 15]);
         }
         
         //TODO check: pi rotlicht zu störend? smiley, honeycomb, etc? position genau ausmessen!
