@@ -36,38 +36,50 @@ height = 15*2+27;
 module cover()
 {
     cover_thickness = 2;
-    //TODO epsilon zu klein? abmessen!
+    cover_epsilon = epsilon + 0.1;
+    cover_connector_height = 9.6;
     
-    difference()
+    union()
     {
-        union()
-        {
-            translate([-thickness, -thickness, 0])
-            cube([width+2*thickness, length+2*thickness, cover_thickness]);
-            
-            // Stützen für Abdeckung
-            //TODO epsilon
-            translate([thickness+epsilon, thickness+epsilon, cover_thickness])
-            cornered_cylinder(d=8, h=height_connectors, corner4=false);
-            translate([thickness+epsilon, length-thickness-epsilon, cover_thickness])
-            cornered_cylinder(d=8, h=height_connectors, corner3=false);
-            translate([width-thickness-epsilon, length-thickness-epsilon, cover_thickness])
-            cornered_cylinder(d=8, h=height_connectors, corner2=false);
-            translate([width-thickness-epsilon, thickness+epsilon, cover_thickness])
-            cornered_cylinder(d=8, h=height_connectors, corner1=false);
-            
-            //TODO
-            // Kaltgerätestecker
-            translate([width-4, 8+epsilon, cover_thickness])
-            cube([thickness+4, 48-2*epsilon, 15]);
-            //TODO höhe abmessen!
-            translate([width-6, 7+epsilon, cover_thickness])
-            cube([6, 60, 15]);
-        }
+        translate([-thickness, -thickness, 0])
+        cube([width+2*thickness, length+2*thickness, cover_thickness]);
         
-        //TODO check: pi rotlicht zu störend? smiley, honeycomb, etc? position genau ausmessen!
-        translate([width-30, length-30, -1])
-        cube([20,20,cover_thickness+2]);
+        // Stützen für Abdeckung
+        translate([4+cover_epsilon, 4+cover_epsilon, cover_thickness])
+        cornered_cylinder(d=8, h=cover_connector_height, corner4=false);
+        translate([4+cover_epsilon, length-4-cover_epsilon, cover_thickness])
+        cornered_cylinder(d=8, h=cover_connector_height, corner3=false);
+        translate([width-4-cover_epsilon, length-4-cover_epsilon, cover_thickness])
+        cornered_cylinder(d=8, h=cover_connector_height, corner2=false);
+        translate([width-4-cover_epsilon, 4+cover_epsilon, cover_thickness])
+        cornered_cylinder(d=8, h=cover_connector_height, corner1=false);
+        
+        // Border - bottom
+        translate([cover_epsilon, cover_epsilon, cover_thickness])
+        cube([width-2*cover_epsilon, cover_thickness, 4]);
+        
+        // Border - top
+        translate([cover_epsilon, length-cover_thickness-cover_epsilon, cover_thickness])
+        cube([width-2*cover_epsilon, cover_thickness, 4]);
+        
+        // Border - left
+        translate([cover_epsilon, cover_epsilon, cover_thickness])
+        cube([cover_thickness, length-2*cover_epsilon, 4]);
+        
+        // Border - right
+        translate([width-cover_thickness-cover_epsilon, cover_epsilon, cover_thickness])
+        cube([cover_thickness, length-2*cover_epsilon, 4]);
+        
+        //TODO
+        //Kaltgerätestecker
+        translate([width-cover_epsilon, 8+cover_epsilon, cover_thickness])
+        cube([thickness+cover_epsilon, 48-2*cover_epsilon, 14.4]);
+        // Bohrloch KGS
+        translate([width-6, 28, cover_thickness])
+        cube([6, 10, 14.4]);
+        // Rückhalt KGS
+        translate([width-cover_thickness-cover_epsilon, cover_epsilon, cover_thickness])
+        cube([cover_thickness, 63, cover_connector_height]);
     }
 }
 
