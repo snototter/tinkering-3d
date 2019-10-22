@@ -83,9 +83,6 @@ module cover()
     }
 }
 
-translate([width+30, 0, 0])
-cover();
-
 module base()
 {
     difference()
@@ -173,3 +170,5 @@ module base()
     }
 }
 base();
+translate([width+30, 0, 0])
+cover();
