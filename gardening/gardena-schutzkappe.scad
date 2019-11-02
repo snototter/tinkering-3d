@@ -66,10 +66,10 @@ module krampl()
 
 
 schutzkappe();
-translate([14, 0, 0])
+translate([18, 0, 0])
 schutzkappe();
-translate([-14, 0, 0])
+translate([-18, 0, 0])
 schutzkappe();
 
-aufbewahrung();
+//aufbewahrung();
 //krampl();
