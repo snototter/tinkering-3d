@@ -4,7 +4,7 @@ $fn = 144;
 diameter_head=40;
 base_plate_height=6;
 face_height=8;
-diameter_base=diameter_head + 6;
+diameter_base=diameter_head + 10;
 cutter_thickness=1.2;
 
 union()
@@ -15,8 +15,12 @@ union()
         // Base plate
         cylinder(h=base_plate_height, d=diameter_base);
         // Punch hole
-        translate([0, 12, -0.1])
-        cylinder(h=base_plate_height+0.2, d=18);
+        difference()
+        {
+            translate([0, 12, -0.1])
+            cylinder(h=base_plate_height+0.2, d=18);
+            
+        }
     }
 
     // Cutter
@@ -29,8 +33,9 @@ union()
     }
 
     // Dog face
-    linear_extrude(height=base_plate_height+face_height)
+    #linear_extrude(height=base_plate_height+face_height)
     translate([0, -2, 0])
-    resize([0.85*diameter_head, 0], auto=true)
-    import("tracker.svg", convexity=10, center=true, dpi=72);
+    //resize([0.85*diameter_head, 0], auto=true)
+    import("tracker-thicker.svg", convexity=10, center=true, dpi=72);
+    //import("tracker-thicker.dxf", convexity=10, center=true, dpi=72);
 }
