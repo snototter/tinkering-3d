@@ -17,9 +17,10 @@ union()
         // Punch hole
         difference()
         {
-            translate([0, 12, -0.1])
+            translate([0, 14, -0.1])
             cylinder(h=base_plate_height+0.2, d=18);
-            
+            translate([0, 0, -0.2])
+            cylinder(h=base_plate_height+0.4, d=24);
         }
     }
 
@@ -33,9 +34,9 @@ union()
     }
 
     // Dog face
-    #linear_extrude(height=base_plate_height+face_height)
+    linear_extrude(height=base_plate_height+face_height)
     translate([0, -2, 0])
-    //resize([0.85*diameter_head, 0], auto=true)
-    import("tracker-thicker.svg", convexity=10, center=true, dpi=72);
+    resize([0.95*diameter_head, 0], auto=true)
+    import("retraced.svg", convexity=10, center=true, dpi=72);
     //import("tracker-thicker.dxf", convexity=10, center=true, dpi=72);
 }
