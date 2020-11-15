@@ -20,6 +20,6 @@ union()
     %linear_extrude(height=base_plate_height+face_height)
     translate([0, -2, 0])
     resize([0, diameter_head], auto=true)
-    import("retraced.svg", convexity=10, center=true, dpi=72);
+    import("retraced.svg", convexity=2, center=true, dpi=72);
     //import("tracker-thicker.dxf", convexity=10, center=true, dpi=72);
 }
