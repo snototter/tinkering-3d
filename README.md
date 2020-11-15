@@ -1,5 +1,5 @@
 # Custom 3D Builds
-Collection of my custom 3d builds - cad models + gcode
+Collection of my custom 3d builds: (s)cad files and some illustrative images
 
 ## kid-cave
 I built a "cave top" for my kid's bed. These models are used to connect the top to the bed.
